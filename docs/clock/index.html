@@ -2,28 +2,9 @@
   <meta charset="utf-8" />
   <title>時計</title>
   <style>
-    #face {
-      stroke-width: 2px;
-      stroke: black;
-      fill: white;
-    }
-    #hour {
-      stroke-width: 1px;
-      fill: rgb(124, 8, 8);
-      stroke: rgb(167, 50, 50);
-    }
-    #min {
-      stroke-width: 1px;
-      fill: rgb(12, 5, 75);
-      stroke: rgb(50, 87, 167);
-    }
-    #sec {
-      stroke-width: 1px;
-      fill: rgb(4, 66, 18);
-      stroke: rgb(50, 167, 95);
-    }
-    #clock {
-      height: 100%;
+    object {
+      width: 98vh;
+      height: 98vh;
     }
     body {
       text-align: center;
@@ -31,23 +12,23 @@
   </style>
 </head>
 <body>
-  <svg id="clock" viewBox="0 0 100 100">
-    <circle id="face" cx="50" cy="50" r="45" />
-    <g id="hands">
-      <rect id="hour" x="48" y="22" width="4" height="30" rx="3" ry="3" />
-      <rect id="min" x="49" y="10" width="2" height="42" rx="2" ry="2" />
-      <line id="sec" x1="50" y1="50" x2="50" y2="8" />
-    </g>
-  </svg>
+  <object id="clock" type="image/svg+xml" data="clock.svg"></object>
   <script>
     function r(el, deg) {
       el.setAttribute("transform", "rotate(" + deg + " 50 50)");
     }
-    setInterval(function () {
-      let d = new Date(); //d.setSeconds(d.getSeconds() + 60);
-      r(sec, 6 * (d.getSeconds() + d.getMilliseconds() / 1000));
-      r(min, 6 * (d.getMinutes() + d.getSeconds() / 60));
-      r(hour, 30 * (d.getHours() % 12) + d.getMinutes() / 2);
-    }, 50);
+    let clock = document.getElementById("clock");
+    clock.addEventListener("load", () => {
+      let svg = clock.getSVGDocument();
+      let hour = svg.getElementById("hour");
+      let min = svg.getElementById("min");
+      let sec = svg.getElementById("sec");
+      setInterval(function () {
+        let d = new Date(); //d.setSeconds(d.getSeconds() + 60);
+        r(sec, 6 * (d.getSeconds() + d.getMilliseconds() / 1000));
+        r(min, 6 * (d.getMinutes() + d.getSeconds() / 60));
+        r(hour, 30 * (d.getHours() % 12) + d.getMinutes() / 2);
+      }, 50);
+    });
   </script>
 </body>
