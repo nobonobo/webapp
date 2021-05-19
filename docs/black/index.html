@@ -1,39 +1,43 @@
-<style>
-  body {
-    background-color: black;
-    margin: 0;
-  }
-  #fullscreen {
-    position: absolute;
-    right: 10vh;
-    bottom: 10vh;
-    border: none;
-    border-radius: 5vh;
-    width: 10vh;
-    height: 10vh;
-    line-height: 10vh;
-    font-size: 4vh;
-    color: white;
-    transition: opacity ease-in-out 0.2s;
-    opacity: 0;
-  }
-  #fullscreen:hover {
-    transition: opacity ease-in-out 0.2s;
-    opacity: 50%;
-  }
-</style>
-<script>
-  function btnClick() {
-    let btn = document.getElementById("fullscreen");
-    if (btn.innerText === "＜＞") {
-      document.body.webkitRequestFullscreen();
-      btn.innerText = "＞＜";
-    } else {
-      document.webkitCancelFullScreen();
-      btn.innerText = "＜＞";
+<head>
+  <meta charset="utf-8" />
+  <title>黒画面</title>
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
     }
-  }
-</script>
+    #fullscreen {
+      position: absolute;
+      right: 10vh;
+      bottom: 10vh;
+      border: none;
+      border-radius: 5vh;
+      width: 10vh;
+      height: 10vh;
+      line-height: 10vh;
+      font-size: 4vh;
+      color: white;
+      transition: opacity ease-in-out 0.2s;
+      opacity: 0;
+    }
+    #fullscreen:hover {
+      transition: opacity ease-in-out 0.2s;
+      opacity: 50%;
+    }
+  </style>
+</head>
 <body>
   <button id="fullscreen" onclick="btnClick()">＜＞</button>
+  <script>
+    function btnClick() {
+      let btn = document.getElementById("fullscreen");
+      if (btn.innerText === "＜＞") {
+        document.body.webkitRequestFullscreen();
+        btn.innerText = "＞＜";
+      } else {
+        document.webkitCancelFullScreen();
+        btn.innerText = "＜＞";
+      }
+    }
+  </script>
 </body>
