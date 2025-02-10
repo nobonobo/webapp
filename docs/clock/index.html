@@ -14,8 +14,17 @@
 <body>
   <object id="clock" type="image/svg+xml" data="clock.svg"></object>
   <script>
-    function r(el, deg) {
+    function rotate(el, deg) {
       el.setAttribute("transform", "rotate(" + deg + " 50 50)");
+    }
+    function getISODateAndDayOfWeek(date) {
+      const isoDate = date.toISOString().split("T")[0];
+      const daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"];
+      const dayOfWeek = daysOfWeek[date.getDay()];
+      return {
+        isoDate: isoDate,
+        dayOfWeek: dayOfWeek,
+      };
     }
     let clock = document.getElementById("clock");
     clock.addEventListener("load", () => {
@@ -23,11 +32,16 @@
       let hour = svg.getElementById("hour");
       let min = svg.getElementById("min");
       let sec = svg.getElementById("sec");
+      let date = svg.getElementById("date");
+      let weekday = svg.getElementById("weekday");
       setInterval(function () {
         let d = new Date(); //d.setSeconds(d.getSeconds() + 60);
-        r(sec, 6 * (d.getSeconds() + d.getMilliseconds() / 1000));
-        r(min, 6 * (d.getMinutes() + d.getSeconds() / 60));
-        r(hour, 30 * (d.getHours() % 12) + d.getMinutes() / 2);
+        rotate(sec, 6 * (d.getSeconds() + d.getMilliseconds() / 1000));
+        rotate(min, 6 * (d.getMinutes() + d.getSeconds() / 60));
+        rotate(hour, 30 * (d.getHours() % 12) + d.getMinutes() / 2);
+        const result = getISODateAndDayOfWeek(new Date());
+        date.textContent = result.isoDate;
+        weekday.textContent = "(" + result.dayOfWeek + ")";
       }, 50);
     });
   </script>
