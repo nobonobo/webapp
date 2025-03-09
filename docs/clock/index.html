@@ -34,7 +34,7 @@
       let sec = svg.getElementById("sec");
       let date = svg.getElementById("date");
       let weekday = svg.getElementById("weekday");
-      setInterval(function () {
+      let update = function () {
         let d = new Date(); //d.setSeconds(d.getSeconds() + 60);
         rotate(sec, 6 * (d.getSeconds() + d.getMilliseconds() / 1000));
         rotate(min, 6 * (d.getMinutes() + d.getSeconds() / 60));
@@ -44,7 +44,9 @@
         const day = ("0" + d.getDate()).slice(-2); // 日を2桁に整形
         date.textContent = `${year}/${month}/${day}`;
         weekday.textContent = "(" + d.dayOfWeek + ")";
-      }, 50);
+        requestAnimationFrame(update);
+      };
+      update();
     });
   </script>
 </body>
