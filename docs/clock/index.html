@@ -43,7 +43,7 @@
         const month = ("0" + (d.getMonth() + 1)).slice(-2); // 月を2桁に整形
         const day = ("0" + d.getDate()).slice(-2); // 日を2桁に整形
         date.textContent = `${year}/${month}/${day}`;
-        weekday.textContent = "(" + result.dayOfWeek + ")";
+        weekday.textContent = "(" + d.dayOfWeek + ")";
       }, 50);
     });
   </script>
