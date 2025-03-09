@@ -17,15 +17,6 @@
     function rotate(el, deg) {
       el.setAttribute("transform", "rotate(" + deg + " 50 50)");
     }
-    function getISODateAndDayOfWeek(date) {
-      const isoDate = date.toISOString().split("T")[0];
-      const daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"];
-      const dayOfWeek = daysOfWeek[date.getDay()];
-      return {
-        isoDate: isoDate,
-        dayOfWeek: dayOfWeek,
-      };
-    }
     let clock = document.getElementById("clock");
     clock.addEventListener("load", () => {
       let svg = clock.getSVGDocument();
@@ -43,7 +34,7 @@
         const month = ("0" + (d.getMonth() + 1)).slice(-2); // 月を2桁に整形
         const day = ("0" + d.getDate()).slice(-2); // 日を2桁に整形
         date.textContent = `${year}/${month}/${day}`;
-        weekday.textContent = "(" + d.dayOfWeek + ")";
+        weekday.textContent = "(" + daysOfWeek[d.getDay()] + ")";
         requestAnimationFrame(update);
       };
       update();
