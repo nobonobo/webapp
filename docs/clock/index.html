@@ -5,7 +5,8 @@
   <link rel="icon" href="./favicon.ico" type="image/png" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./favicon.ico" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <!--meta name="apple-mobile-web-app-capable" content="yes" /-->
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <meta name="apple-mobile-web-app-title" content="時計" />
   <style>
@@ -38,9 +39,11 @@
     // 状態をlocalStorageに保存
     function saveCheckboxState() {
       localStorage.setItem(storageKey, checkbox.checked);
+      console.log("saved:", checkbox.checked);
     }
     function loadCheckboxState() {
       const saved = localStorage.getItem(storageKey);
+      console.log("load:", saved);
       if (saved === "true") {
         checkbox.checked = true;
         requestWakeLock();
@@ -54,8 +57,8 @@
       try {
         wakeLock = await navigator.wakeLock.request("screen");
         wakeLock.addEventListener("release", () => {
+          console.log("released");
           checkbox.checked = false;
-          saveCheckboxState();
           wakeLock = null;
         });
       } catch (err) {
@@ -85,8 +88,11 @@
     });
 
     // ページが非表示→再表示時にWake Lockを再取得
-    document.addEventListener("visibilitychange", () => {
-      loadCheckboxState();
+    document.addEventListener("visibilitychange", (ev) => {
+      console.log("visibilitychange:", ev.target.visibilityState);
+      if (ev.target.visibilityState == "visible") {
+        loadCheckboxState();
+      }
     });
 
     function rotate(el, deg) {
