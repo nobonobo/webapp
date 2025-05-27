@@ -39,7 +39,16 @@
     function saveCheckboxState() {
       localStorage.setItem(storageKey, checkbox.checked);
     }
-
+    function loadCheckboxState() {
+      const saved = localStorage.getItem(storageKey);
+      if (saved === "true") {
+        checkbox.checked = true;
+        requestWakeLock();
+      } else {
+        checkbox.checked = false;
+        releaseWakeLock();
+      }
+    }
     // Wake Lockを要求
     async function requestWakeLock() {
       try {
@@ -77,9 +86,7 @@
 
     // ページが非表示→再表示時にWake Lockを再取得
     document.addEventListener("visibilitychange", () => {
-      if (checkbox.checked && document.visibilityState === "visible") {
-        requestWakeLock();
-      }
+      loadCheckboxState();
     });
 
     function rotate(el, deg) {
@@ -89,14 +96,7 @@
     const daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"];
     let clock = document.getElementById("clock");
     clock.addEventListener("load", () => {
-      const saved = localStorage.getItem(storageKey);
-      if (saved === "true") {
-        checkbox.checked = true;
-        requestWakeLock();
-      } else {
-        checkbox.checked = false;
-        releaseWakeLock();
-      }
+      loadCheckboxState();
       let svg = clock.getSVGDocument();
       let hour = svg.getElementById("hour");
       let min = svg.getElementById("min");
