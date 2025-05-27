@@ -17,17 +17,86 @@
     body {
       text-align: center;
     }
+    #stop-idle {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
   </style>
 </head>
 <body>
   <object id="clock" type="image/svg+xml" data="clock.svg"></object>
+  <label id="stop-idle">
+    <span>画面スリープ防止</span>
+    <input type="checkbox" id="wakelock-checkbox" />
+  </label>
   <script>
+    let wakeLock = null;
+    const checkbox = document.getElementById("wakelock-checkbox");
+    const storageKey = "wakelock_checkbox_state";
+
+    // 状態をlocalStorageに保存
+    function saveCheckboxState() {
+      localStorage.setItem(storageKey, checkbox.checked);
+    }
+
+    // Wake Lockを要求
+    async function requestWakeLock() {
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => {
+          checkbox.checked = false;
+          saveCheckboxState();
+          wakeLock = null;
+        });
+      } catch (err) {
+        checkbox.checked = false;
+        saveCheckboxState();
+        wakeLock = null;
+        alert("Wake Lockの取得に失敗しました: " + err.message);
+      }
+    }
+
+    // Wake Lockを解除
+    async function releaseWakeLock() {
+      if (wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+      }
+    }
+
+    // チェックボックスの状態変化でWake LockとlocalStorageを制御
+    checkbox.addEventListener("change", () => {
+      saveCheckboxState();
+      if (checkbox.checked) {
+        requestWakeLock();
+      } else {
+        releaseWakeLock();
+      }
+    });
+
+    // ページが非表示→再表示時にWake Lockを再取得
+    document.addEventListener("visibilitychange", () => {
+      if (checkbox.checked && document.visibilityState === "visible") {
+        requestWakeLock();
+      }
+    });
+
     function rotate(el, deg) {
       el.setAttribute("transform", "rotate(" + deg + " 50 50)");
     }
+
     const daysOfWeek = ["日", "月", "火", "水", "木", "金", "土"];
     let clock = document.getElementById("clock");
     clock.addEventListener("load", () => {
+      const saved = localStorage.getItem(storageKey);
+      if (saved === "true") {
+        checkbox.checked = true;
+        requestWakeLock();
+      } else {
+        checkbox.checked = false;
+        releaseWakeLock();
+      }
       let svg = clock.getSVGDocument();
       let hour = svg.getElementById("hour");
       let min = svg.getElementById("min");
