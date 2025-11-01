@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Viewer</title>
+  </head>
+  <body style="margin: 0; padding: 0">
+    <video id="video" autoplay playsinline controls></video>
+    <br />
+    <label for="videoSelect">カメラ選択:</label>
+    <select id="videoSelect"></select>
+    <br />
+    <label for="audioSelect">マイク選択:</label>
+    <select id="audioSelect"></select>
+    <br />
+    <button id="startButton">開始</button>
+    <script>
+      const videoElem = document.getElementById("video");
+      const videoSelect = document.getElementById("videoSelect");
+      const audioSelect = document.getElementById("audioSelect");
+      const startButton = document.getElementById("startButton");
+      let currentStream = null;
+
+      const STORAGE_VIDEO = "preferredVideoDeviceId";
+      const STORAGE_AUDIO = "preferredAudioDeviceId";
+
+      async function getDevices() {
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          videoSelect.innerHTML = "";
+          audioSelect.innerHTML = "";
+          devices.forEach((device) => {
+            const option = document.createElement("option");
+            option.value = device.deviceId;
+            option.text = device.label || device.kind;
+            if (device.kind === "videoinput") {
+              videoSelect.appendChild(option);
+            } else if (device.kind === "audioinput") {
+              audioSelect.appendChild(option);
+            }
+          });
+
+          // 保存された選択があれば復元
+          const savedVideo = localStorage.getItem(STORAGE_VIDEO);
+          if (
+            savedVideo &&
+            Array.from(videoSelect.options).some((o) => o.value === savedVideo)
+          ) {
+            videoSelect.value = savedVideo;
+          }
+
+          const savedAudio = localStorage.getItem(STORAGE_AUDIO);
+          if (
+            savedAudio &&
+            Array.from(audioSelect.options).some((o) => o.value === savedAudio)
+          ) {
+            audioSelect.value = savedAudio;
+          }
+        } catch (error) {
+          console.error("デバイス取得エラー:", error);
+        }
+      }
+      async function fullscreen() {
+        await startStream();
+        // フルスクリーンをリクエスト
+        if (videoElem.requestFullscreen) {
+          await videoElem.requestFullscreen();
+        } else if (videoElem.webkitRequestFullscreen) {
+          /* Safari */
+          await videoElem.webkitRequestFullscreen();
+        } else if (videoElem.mozRequestFullScreen) {
+          /* Firefox */
+          await videoElem.mozRequestFullScreen();
+        } else if (videoElem.msRequestFullscreen) {
+          /* IE/Edge */
+          await videoElem.msRequestFullscreen();
+        }
+      }
+      async function startStream() {
+        if (currentStream) {
+          currentStream.getTracks().forEach((track) => track.stop());
+        }
+
+        const constraints = {
+          video: {
+            width: { exact: 1920 },
+            height: { exact: 1080 },
+            frameRate: { ideal: 60, max: 60 },
+            deviceId: videoSelect.value
+              ? { exact: videoSelect.value }
+              : undefined,
+          },
+          audio: {
+            echoCancellation: false, // エコーキャンセラー無効化
+            noiseSuppression: false, // ノイズ抑制無効化
+            autoGainControl: false, // 自動利得制御無効化
+            deviceId: audioSelect.value
+              ? { exact: audioSelect.value }
+              : undefined,
+          },
+        };
+
+        try {
+          currentStream = await navigator.mediaDevices.getUserMedia(
+            constraints
+          );
+          videoElem.srcObject = currentStream;
+
+          // 選択状態を保存
+          localStorage.setItem(STORAGE_VIDEO, videoSelect.value);
+          localStorage.setItem(STORAGE_AUDIO, audioSelect.value);
+        } catch (error) {
+          console.error("ストリーム開始エラー:", error);
+        }
+      }
+
+      startButton.addEventListener("click", fullscreen);
+      videoSelect.addEventListener("change", startStream);
+      audioSelect.addEventListener("change", startStream);
+
+      (async () => {
+        await getDevices();
+      })();
+    </script>
+  </body>
+</html>
